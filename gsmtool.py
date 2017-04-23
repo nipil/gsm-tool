@@ -62,7 +62,7 @@ class Modem(object):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument("--device")
+    parser.add_argument("--device", required=True)
     parser.add_argument("--speed", type=int, default=115200)
     parser.add_argument("--debug", action='store_true')
     parser.add_argument("action")
