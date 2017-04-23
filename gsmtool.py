@@ -67,7 +67,7 @@ class Modem(object):
         seconds = int(m.group(6))
         print("%04d-%02d-%02d %02d:%02d:%02d" % (year, month, day, hour, minute, seconds))
 
-    def get_sms(self):
+    def get_pdu(self):
         self._command("AT+CMEE=1")
         self._command("AT+CMGF=0")
         self._command("AT+CPMS=\"SM\",\"SM\",\"SM\"")
@@ -98,5 +98,5 @@ if __name__ == '__main__':
 
     if args.action == "clock":
         modem.get_time()
-    elif args.action == "readsms":
-        modem.get_sms()
+    elif args.action == "readpdu":
+        modem.get_pdu()
