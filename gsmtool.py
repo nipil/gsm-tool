@@ -21,6 +21,9 @@ class Modem(object):
     def noop(self):
         self._command("AT")
 
+    def activate(self):
+        self._command("AT+CFUN=1")
+
     def _command(self, cmd):
         out_line = "%s\r\n" % cmd
         in_lines = []
@@ -52,13 +55,24 @@ class Modem(object):
         m = p.match(data)
         if m is None:
             raise Exception("%s didn't match regex %s" % (data, p.pattern))
-        year = 1900 + int(m.group(1))
+        year = int(m.group(1))
+        if year >= 80:
+            year += 1900
+        else:
+            year += 2000
         month = int(m.group(2))
         day = int(m.group(3))
         hour = int(m.group(4))
         minute = int(m.group(5))
         seconds = int(m.group(6))
         print("%04d-%02d-%02d %02d:%02d:%02d" % (year, month, day, hour, minute, seconds))
+
+    def get_sms(self):
+        self._command("AT+CMEE=1")
+        self._command("AT+CMGF=0")
+        self._command("AT+CPMS=\"SM\",\"SM\",\"SM\"")
+        lines = self._command("AT+CMGL=4")
+        print(lines)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -72,6 +86,9 @@ if __name__ == '__main__':
     modem.set_debug(args.debug)
     modem.reset()
     modem.noop()
+    modem.activate()
 
     if args.action == "clock":
         modem.get_time()
+    elif args.action == "readsms":
+        modem.get_sms()
