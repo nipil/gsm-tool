@@ -67,7 +67,7 @@ class Modem(object):
         seconds = int(m.group(6))
         print("%04d-%02d-%02d %02d:%02d:%02d" % (year, month, day, hour, minute, seconds))
 
-    def get_pdu(self):
+    def extract_pdu(self):
         self._command("AT+CMEE=1")
         self._command("AT+CMGF=0")
         self._command("AT+CPMS=\"SM\",\"SM\",\"SM\"")
@@ -78,9 +78,11 @@ class Modem(object):
             m = p.match(line)
             if m is None:
                 continue
+            slot = int(m.group(1))
             length = int(m.group(3))
             pdu = lines.pop(0)
             print("%d,%s" % (length, pdu))
+            self._command("AT+CMGD=%d" % slot)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -98,5 +100,5 @@ if __name__ == '__main__':
 
     if args.action == "clock":
         modem.get_time()
-    elif args.action == "readpdu":
-        modem.get_pdu()
+    elif args.action == "pdu":
+        modem.extract_pdu()
