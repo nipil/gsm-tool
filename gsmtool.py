@@ -72,7 +72,15 @@ class Modem(object):
         self._command("AT+CMGF=0")
         self._command("AT+CPMS=\"SM\",\"SM\",\"SM\"")
         lines = self._command("AT+CMGL=4")
-        print(lines)
+        while len(lines) > 0:
+            line = lines.pop(0)
+            p = re.compile('^\+CMGL: (\d+),(\d+),[^,]*,(\d+)$')
+            m = p.match(line)
+            if m is None:
+                continue
+            length = int(m.group(3))
+            pdu = lines.pop(0)
+            print("%d,%s" % (length, pdu))
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
